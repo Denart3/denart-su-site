@@ -5,51 +5,228 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>denart.su — личный сервис автоматизации</title>
 <style>
-  :root { color-scheme: light dark; }
-  body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; max-width: 760px;
-         margin: 0 auto; padding: 40px 20px; line-height: 1.6; }
-  h1 { font-size: 1.6rem; margin-bottom: .2em; }
-  .sub { opacity: .7; margin-top: 0; }
-  ul { padding-left: 1.2em; }
-  footer { margin-top: 3em; padding-top: 1em; border-top: 1px solid rgba(128,128,128,.3);
-           font-size: .9rem; opacity: .75; }
-  a { color: inherit; }
+  .bg { position:absolute; inset:0; }
+  .bg::before { content:""; position:absolute; inset:0;
+    background:
+      radial-gradient(115% 85% at 8% 2%, #222a38 0%, rgba(12,15,20,0) 62%),
+      radial-gradient(85% 75% at 92% 98%, #2b241c 0%, rgba(10,12,16,0) 58%),
+      linear-gradient(158deg, #0f141b 0%, #0a0e13 52%, #17120c 100%); }
+  .bg i { position:absolute; display:block; }
+  .plank { top:-6%; height:112%; opacity: var(--d,1);
+    box-shadow: inset -1px 0 0 rgba(255,255,255,.055), inset 1px 0 0 rgba(0,0,0,.6); }
+  .plank.wood {
+    background:
+      repeating-linear-gradient(90deg,
+        rgba(0,0,0,.42) 0 1px, rgba(255,228,190,.10) 1px 2px,
+        rgba(0,0,0,.10) 2px 5px, rgba(255,214,166,.05) 5px 6px,
+        rgba(0,0,0,0) 6px 14px, rgba(0,0,0,.22) 14px 15px),
+      repeating-linear-gradient(90deg, rgba(0,0,0,.16) 0 40px, rgba(0,0,0,0) 40px 96px),
+      linear-gradient(180deg, hsl(var(--hue) 42% calc(var(--l) * 1% - 8%)),
+        hsl(var(--hue) 46% calc(var(--l) * 1% + 6%)) 44%,
+        hsl(var(--hue) 40% calc(var(--l) * 1% - 12%))); }
+  .plank.dark {
+    background:
+      repeating-linear-gradient(90deg, rgba(0,0,0,.38) 0 1px,
+        rgba(255,255,255,.03) 1px 2px, rgba(0,0,0,0) 2px 6px),
+      linear-gradient(180deg, #2a313e 0%, #1b212b 46%, #10141b 100%); }
+  .plank.void { background: linear-gradient(180deg,#0c1017 0%,#06090d 100%); }
+  .hatch { position:absolute; left:34%; top:20%; width:34%; height:58%;
+    background: repeating-linear-gradient(40deg, #2b323d 0 15px, #1a1f28 15px 18px,
+      #33261a 18px 31px, #1b2029 31px 47px);
+    box-shadow: 0 34px 80px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.05);
+    filter: saturate(1.05); }
+  .hatch.two { left:0%; top:58%; width:22%; height:40%; transform: rotate(-90deg); opacity:.5; }
+  .block { background: linear-gradient(168deg,#2b323f 0%,#1c222c 36%,#0d1117 100%);
+    box-shadow: 0 30px 56px rgba(0,0,0,.62), inset 0 2px 0 rgba(255,255,255,.07),
+      inset 0 -2px 0 rgba(0,0,0,.75); }
+  .acc-top { position:absolute; left:0; right:0; top:-5px; height:5px;
+    background: linear-gradient(90deg, rgba(255,106,0,0), #ff7a1a 20%, #ffb972 62%, rgba(255,106,0,0));
+    box-shadow: 0 0 20px 3px rgba(255,120,20,.6); }
+  .acc-left { position:absolute; top:8%; bottom:8%; left:-5px; width:5px;
+    background: linear-gradient(180deg,#ff6a00,#ff9d3c);
+    box-shadow: 0 0 18px 3px rgba(255,120,20,.55); }
+  .acc-right { position:absolute; top:14%; bottom:14%; right:-5px; width:5px;
+    background: linear-gradient(180deg,#ff8a2b,#ff5c00);
+    box-shadow: 0 0 18px 3px rgba(255,120,20,.55); }
+  .line { background: linear-gradient(90deg, rgba(255,138,43,0), #ff7a1a 35%, #ffd0a1 56%, rgba(255,138,43,0));
+    box-shadow: 0 0 15px 2px rgba(255,120,20,.6), 0 0 46px 8px rgba(255,110,10,.25); }
+  .line.corner-h, .line.corner-v { box-shadow: 0 0 12px 2px rgba(255,120,20,.5); }
+  .line.corner-v { background: linear-gradient(180deg, rgba(255,138,43,0), #ff7a1a 40%, rgba(255,138,43,0)); }
+  .scrim { position:absolute; inset:0;
+    background:
+      linear-gradient(97deg, rgba(6,8,12,.90) 0%, rgba(6,8,12,.74) 26%,
+        rgba(6,8,12,.22) 55%, rgba(6,8,12,.40) 100%),
+      linear-gradient(0deg, rgba(6,8,12,.88) 0%, rgba(6,8,12,0) 30%),
+      radial-gradient(70% 60% at 78% 46%, rgba(6,8,12,0) 40%, rgba(6,8,12,.35) 100%); }
+
+  :root { --bg-0:#0a0d12; --ink:#eef1f6; --muted:#9aa3b2; --orange:#ff8a2b;
+          color-scheme: dark; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; }
+  body { background:var(--bg-0); color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased; }
+  .hero { position:relative; overflow:hidden; min-height:100svh; display:flex; }
+  .band { position:absolute; inset:0; }
+  .wrap { position:relative; width:min(1120px,92vw); margin:0 auto;
+    padding:clamp(26px,7vh,84px) 0 56px; display:flex; flex-direction:column;
+    min-height:100svh; }
+  .badge { display:inline-flex; align-items:center; gap:8px; align-self:flex-start;
+    font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:#ffb37a;
+    border:1px solid rgba(255,138,43,.35); border-radius:999px; padding:6px 14px;
+    background:rgba(255,138,43,.07); }
+  .badge s { width:6px; height:6px; border-radius:50%; background:var(--orange);
+    box-shadow:0 0 10px 2px rgba(255,138,43,.8); text-decoration:none; }
+  h1 { font-size:clamp(2.6rem,7vw,4.4rem); line-height:1.02; margin:.4em 0 .12em;
+    letter-spacing:-.02em; font-weight:700; text-shadow:0 2px 30px rgba(0,0,0,.6); }
+  h1 em { font-style:normal; color:var(--orange); text-shadow:0 0 38px rgba(255,106,0,.55); }
+  .sub { color:#b6bfcc; max-width:56ch; margin:0 0 1.5em;
+    font-size:clamp(.98rem,1.6vw,1.1rem); }
+  section.info { display:grid; gap:16px; margin-top:.2em;
+    grid-template-columns:repeat(auto-fit,minmax(248px,1fr)); }
+  article { background:rgba(14,18,25,.62); border:1px solid rgba(255,255,255,.08);
+    border-radius:14px; padding:18px 20px 16px; backdrop-filter:blur(10px);
+    box-shadow:0 18px 40px rgba(0,0,0,.4); }
+  article h2 { font-size:1rem; margin:0 0 .55em; }
+  article h2::before { content:""; display:inline-block; width:14px; height:2px;
+    margin-right:9px; vertical-align:middle; background:var(--orange);
+    box-shadow:0 0 10px 1px rgba(255,138,43,.7); }
+  article p, article ul { margin:0; color:#cdd5e1; font-size:.94rem; }
+  article ul { padding-left:1.05em; }
+  article li { margin:.22em 0; }
+  .cta { margin-top:auto; padding-top:36px; display:flex; flex-wrap:wrap;
+    gap:14px; align-items:center; }
+  a.btn { display:inline-flex; align-items:center; gap:10px; text-decoration:none;
+    color:#140d05; font-weight:650; background:linear-gradient(180deg,#ffa04d,#ff6a00);
+    border-radius:12px; padding:15px 28px; transition:transform .15s ease;
+    box-shadow:0 14px 34px rgba(255,106,0,.35), inset 0 0 0 1px rgba(255,196,132,.55); }
+  a.btn:hover { transform:translateY(-1px); }
+  .hint { color:#9aa3b2; font-size:.86rem; max-width:34ch; }
+  footer { border-top:1px solid rgba(255,255,255,.09); margin-top:32px;
+    padding-top:16px; display:flex; flex-wrap:wrap; gap:8px 22px;
+    color:#9aa3b2; font-size:.88rem; }
+  footer a { color:#dbe2ec; text-decoration:none; border-bottom:1px solid rgba(255,138,43,.35); }
+  footer a:hover { color:var(--orange); }
+  @media (max-width:760px) {
+    .hero { display:block; min-height:auto; }
+    .band { position:relative; height:46svh; min-height:300px; overflow:hidden; }
+    .band .bg, .band .scrim { position:absolute; inset:0; }
+    .wrap { min-height:auto; padding:24px 0 40px; }
+    .hatch { left:44%; width:58%; }
+    .cta { margin-top:26px; padding-top:20px; }
+    article { background:rgba(14,18,25,.92); }
+    footer { margin-top:26px; }
+  }
 </style>
 </head>
 <body>
-  <h1>denart.su</h1>
-  <p class="sub">Персональный домен Дениса Артамонова. Личный проект, не коммерческий сервис.</p>
+  <div class="hero">
+    <div class="band">
+      <div class="bg" aria-hidden="true">
+    <i class="plank void" style="left:-1.50%;width:6.20%"></i>
+      <i class="plank dark" style="left:4.70%;width:0.80%;--d:0.9"></i>
+      <i class="plank wood" style="left:5.62%;width:1.90%;--hue:32;--l:26;--d:1"></i>
+      <i class="plank dark" style="left:7.52%;width:1.30%;--d:1"></i>
+      <i class="plank wood" style="left:8.94%;width:0.80%;--hue:34;--l:30;--d:0.85"></i>
+      <i class="plank wood" style="left:9.86%;width:0.80%;--hue:24;--l:30;--d:1"></i>
+      <i class="plank wood" style="left:10.66%;width:1.90%;--hue:28;--l:30;--d:1"></i>
+      <i class="plank wood" style="left:12.68%;width:4.60%;--hue:32;--l:38;--d:1"></i>
+      <i class="plank void" style="left:17.58%;width:1.90%"></i>
+      <i class="plank dark" style="left:19.60%;width:3.40%;--d:0.9"></i>
+      <i class="plank void" style="left:23.12%;width:0.80%"></i>
+      <i class="plank dark" style="left:24.22%;width:6.20%;--d:0.7"></i>
+      <i class="plank void" style="left:30.72%;width:1.30%"></i>
+      <i class="plank void" style="left:32.14%;width:1.90%"></i>
+      <i class="plank wood" style="left:34.04%;width:4.60%;--hue:32;--l:38;--d:1"></i>
+      <i class="plank wood" style="left:38.64%;width:2.60%;--hue:34;--l:38;--d:1"></i>
+      <i class="plank wood" style="left:41.54%;width:6.20%;--hue:24;--l:34;--d:1"></i>
+      <i class="plank wood" style="left:47.74%;width:3.40%;--hue:28;--l:26;--d:1"></i>
+      <i class="plank wood" style="left:51.14%;width:0.80%;--hue:20;--l:38;--d:1"></i>
+      <i class="plank wood" style="left:52.24%;width:3.40%;--hue:28;--l:38;--d:1"></i>
+      <i class="plank wood" style="left:55.64%;width:2.60%;--hue:24;--l:38;--d:1"></i>
+      <i class="plank void" style="left:58.24%;width:3.40%"></i>
+      <i class="plank void" style="left:61.94%;width:0.80%"></i>
+      <i class="plank dark" style="left:63.04%;width:1.30%;--d:1"></i>
+      <i class="plank dark" style="left:64.46%;width:0.80%;--d:1"></i>
+      <i class="plank wood" style="left:65.26%;width:6.20%;--hue:24;--l:26;--d:1"></i>
+      <i class="plank wood" style="left:71.58%;width:1.30%;--hue:28;--l:34;--d:0.85"></i>
+      <i class="plank wood" style="left:73.00%;width:0.80%;--hue:32;--l:26;--d:1"></i>
+      <i class="plank dark" style="left:73.92%;width:1.30%;--d:0.9"></i>
+      <i class="plank dark" style="left:75.22%;width:6.20%;--d:1"></i>
+      <i class="plank wood" style="left:81.72%;width:3.40%;--hue:20;--l:30;--d:0.85"></i>
+      <i class="plank void" style="left:85.42%;width:1.90%"></i>
+      <i class="plank wood" style="left:87.32%;width:4.60%;--hue:24;--l:34;--d:1"></i>
+      <i class="plank dark" style="left:91.92%;width:4.60%;--d:0.7"></i>
+      <i class="plank void" style="left:96.52%;width:6.20%"></i>
+    <div class="hatch"></div>
+    <div class="hatch two"></div>
+    <i class="block" style="left:5%;top:10%;width:12%;height:8%"><b class=acc-top></b></i>
+      <i class="block" style="left:11%;top:44%;width:8%;height:15%"><b class=acc-left></b></i>
+      <i class="block" style="left:21%;top:27%;width:15%;height:9%"><b class=acc-right></b></i>
+      <i class="block" style="left:37%;top:8%;width:10%;height:18%"><b class=acc-top></b></i>
+      <i class="block" style="left:48%;top:49%;width:13%;height:12%"><b class=acc-top></b></i>
+      <i class="block" style="left:60%;top:20%;width:16%;height:8%"><b class=acc-left></b></i>
+      <i class="block" style="left:69%;top:58%;width:9%;height:15%"><b class=acc-top></b></i>
+      <i class="block" style="left:79%;top:12%;width:14%;height:11%"><b class=acc-right></b></i>
+      <i class="block" style="left:87%;top:40%;width:8%;height:10%"></i>
+      <i class="block" style="left:30%;top:68%;width:13%;height:9%"><b class=acc-left></b></i>
+      <i class="block" style="left:55%;top:78%;width:15%;height:8%"><b class=acc-top></b></i>
+      <i class="block" style="left:77%;top:82%;width:11%;height:11%"></i>
+      <i class="block" style="left:2%;top:74%;width:9%;height:12%"><b class=acc-right></b></i>
+      <i class="block" style="left:92%;top:66%;width:7%;height:14%"><b class=acc-left></b></i>
+    <i class="line" style="left:33%;top:18%;width:14%;height:2px"></i>
+      <i class="line" style="left:46%;top:7%;width:1px;height:13%"></i>
+      <i class="line" style="left:68%;top:33%;width:16%;height:2px"></i>
+      <i class="line" style="left:18%;top:57%;width:2px;height:11%"></i>
+      <i class="line" style="left:78%;top:12%;width:1px;height:9%"></i>
+      <i class="line" style="left:40%;top:62%;width:13%;height:1px"></i>
+      <i class="line" style="left:85%;top:46%;width:8%;height:2px"></i>
+      <i class="line corner-h" style="left:26%;top:37%;width:20%"></i>
+      <i class="line corner-v" style="left:45.8%;top:22%;height:15%"></i>
+  </div>
+      <div class="scrim" aria-hidden="true"></div>
+    </div>
+    <div class="wrap">
+      <span class="badge"><s></s>личный домен</span>
+      <h1>denart<em>.su</em></h1>
+      <p class="sub">Персональный домен. Личный проект владельца, не коммерческий сервис.</p>
 
-  <h2>Назначение</h2>
-  <p>
-    Домен используется для личного приложения автоматизации, которое работает на моём
-    собственном сервере и обслуживает одного пользователя — владельца аккаунта.
-    Приложение помогает обрабатывать почту, файлы и календарь владельца и не предназначено
-    для других пользователей.
-  </p>
+      <section class="info">
+        <article>
+          <h2>Назначение</h2>
+          <p>Домен используется для личного приложения автоматизации, которое работает на моём
+             собственном сервере и обслуживает одного пользователя — владельца аккаунта.
+             Приложение помогает обрабатывать почту, файлы и календарь владельца.</p>
+        </article>
+        <article>
+          <h2>Что делает приложение</h2>
+          <ul>
+            <li>Читает и сортирует входящую почту владельца по заданным правилам.</li>
+            <li>Работает с файлами и документами владельца в его облачном хранилище.</li>
+            <li>Формирует напоминания и заметки по событиям владельца.</li>
+          </ul>
+        </article>
+        <article>
+          <h2>Чего приложение не делает</h2>
+          <ul>
+            <li>Не передаёт и не продаёт данные третьим лицам.</li>
+            <li>Не используется для рассылок, рекламы или сбора данных других людей.</li>
+            <li>Не предоставляет доступ к аккаунту владельца кому-либо ещё.</li>
+          </ul>
+        </article>
+      </section>
 
-  <h2>Что делает приложение</h2>
-  <ul>
-    <li>Читает и сортирует входящую почту владельца по заданным правилам.</li>
-    <li>Работает с файлами и документами владельца в его облачном хранилище.</li>
-    <li>Формирует напоминания и заметки по событиям владельца.</li>
-  </ul>
+      <div class="cta">
+        <a class="btn" href="https://dash.denart.su">Моя инфраструктура →</a>
+        <span class="hint">Доступ только владельцу: вход по коду на почту через Cloudflare Access.</span>
+      </div>
 
-  <h2>Чего приложение не делает</h2>
-  <ul>
-    <li>Не передаёт и не продаёт данные третьим лицам.</li>
-    <li>Не используется для рассылок, рекламы или сбора данных других людей.</li>
-    <li>Не предоставляет доступ к аккаунту владельца кому-либо ещё.</li>
-  </ul>
-
-  <h2>Документы</h2>
-  <ul>
-    <li><a href="privacy.html">Политика конфиденциальности</a></li>
-    <li><a href="terms.html">Условия использования</a></li>
-  </ul>
-
-  <footer>
-    Контакт: denart3@gmail.com · Обновлено 26.09.2026
-  </footer>
+      <footer>
+        <span>Документы: <a href="privacy.html">Политика конфиденциальности</a> ·
+          <a href="terms.html">Условия использования</a></span>
+        <span>Контакт: denart3@gmail.com</span>
+      </footer>
+    </div>
+  </div>
 </body>
 </html>
